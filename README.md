@@ -117,6 +117,7 @@ Untuk mengevaluasi kinerja kedua model rekomendasi, digunakan beberapa metrik be
 
 Formula untuk Cosine Similarity yaitu:
 ![CS](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cosine_similarity.png)
+
 \[
 \text{sim}(A, B) = \frac{A \cdot B}{\|A\| \cdot \|B\|} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \cdot \sqrt{\sum_{i=1}^{n} B_i^2}}
 \]
@@ -137,6 +138,7 @@ Nilai cosine similarity berkisar antara:
 
 Formula untuk Diversity dan Novelty yaitu:
 ![Diver](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/diversity.png)
+
 \[
 \text{Diversity}(S) = \frac{2}{|S|(|S|-1)} \sum_{i=1}^{|S|} \sum_{j=i+1}^{|S|} (1 - \text{sim}(i, j))
 \]
@@ -146,6 +148,7 @@ Formula untuk Diversity dan Novelty yaitu:
 - Semakin tinggi nilai Diversity, semakin beragam item rekomendasinya
 
 ![Novel](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/novelty.png)
+
 \[
 \text{Novelty}(R) = \frac{1}{|R|} \sum_{i \in R} -\log_2(P(i))
 \]

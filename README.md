@@ -116,25 +116,59 @@ Untuk mengevaluasi kinerja kedua model rekomendasi, digunakan beberapa metrik be
 - Diversity (Keberagaman)-Novelty (Kebaruan) saat item rekomendasi muncul. Diversity akan mengukur seberapa beragam item yang direkomendasikan (tidak semuanya mirip satu sama lain) dan Novelty akan mengukur seberapa tidak populer / belum dikenal item yang direkomendasikan. Umumnya dihitung dari frekuensi item muncul di data.
 
 Formula untuk Cosine Similarity yaitu:
-![CS]
+![CS](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cosine_similarity.png)
+\[
+\text{sim}(A, B) = \frac{A \cdot B}{\|A\| \cdot \|B\|} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \cdot \sqrt{\sum_{i=1}^{n} B_i^2}}
+\]
+
+- \( A, B \): dua vektor fitur (misalnya genre, embedding, dll)
+- \( A \cdot B \): dot product dari kedua vektor
+- \( \|A\| \): panjang (norma) dari vektor A
+
+Nilai cosine similarity berkisar antara:
+
+1 → sangat mirip (arah vektor sama)
+
+0 → tidak mirip (vektor ortogonal)
+
+-1 → sangat berlawanan arah (jarang muncul di sistem rekomendasi)
+
+<br>
 
 Formula untuk Diversity dan Novelty yaitu:
-![Diver]
-![Novel]
+![Diver](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/diversity.png)
+\[
+\text{Diversity}(S) = \frac{2}{|S|(|S|-1)} \sum_{i=1}^{|S|} \sum_{j=i+1}^{|S|} (1 - \text{sim}(i, j))
+\]
+
+- \( S \): himpunan item yang direkomendasikan
+- \( \text{sim}(i, j) \): similarity antar item i dan j (biasanya cosine similarity)
+- Semakin tinggi nilai Diversity, semakin beragam item rekomendasinya
+
+![Novel](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/novelty.png)
+\[
+\text{Novelty}(R) = \frac{1}{|R|} \sum_{i \in R} -\log_2(P(i))
+\]
+
+- \( R \): himpunan item yang direkomendasikan
+- \( P(i) \): probabilitas/popularitas item i (misalnya: proporsi user yang menonton)
+- Semakin tinggi nilai novelty, semakin unik/tidak umum item tersebut
+
+<br>
 
 Evaluasi untuk hasil rekomendasi dengan Content-Based Filtering yaitu:
-![CS_Result]
+![CS_Result](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cbased_result.png)
   - Untuk rekomendasi pada user yang menonton Toy Story, hasilnya menunjukkan bahwa rekomendasinya memiliki genre yang hampir identik "Adventure Animation Children Comedy Fantasy". Selain itu, judul-judul film berasal dari studio dan gaya yang serupa (misal: Pixar, DreamWorks, Studio Ghibli).
   - Jika melihat nilai Cosine Similarity, nilai kesamaannya sangat tinggi (mendekati 1), sehingga jika melihat juga ke diversitynya, rekomendasi ini kurang beragam namun cocok untuk bisa mempertahankan relevansi.
   - Jika melihat dari sisi Novelty, rekomendasi ini kurang memberikan kebaruan. Cenderung merekomendasikan film yang sudah sangat dikenal user.
 
 Evaluasi untuk hasil rekomendasi dengan Collaborative Filtering yaitu:
-![CB_Result1]
+![CB_Result1](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cb1.png)
   - Untuk rekomendasi berdasarkan preferensi user, diupayakan untuk menyesuaikan hasil rekomendasi dengan kecenderungan genre yang telah ditonton oleh user tertentu. Jika melihat nilai Cosine Similaritynya, hasilnya menunjukkan bahwa sebagian besar rekomendasinya masih sesuai dengan preferensi user,namun beberapa film horror/sci-fi masuk padahal itu bukan preferensi utama user.
   - Jika melihat nilai Novelty, terdapat judul-judul seperti Zombie Lake, Zombie Strippers!, dan The Onion Movie adalah film kurang terkenal di kalangan umum. Sehingga ini bisa untuk merekomendasikan film yang jarang muncul, memberi pengalaman baru.
   - Jika melihat dari sisi Diversity, beberapa film menyertakan kombinasi genre unik (e.g. Comedy Horror, Comedy Documentary Romance), yang menandakan bahwa nilai diversity cukup tinggi. Cocok untuk user yang suka eksplorasi.
 
-![CB_Result2]
+![CB_Result2](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cb2.png)
   - Rekomendasi dilakukan berdasarkan preferensi film yang telah ditonton. Jika melihat nilai Cosine Similaritynya, hasilnya menunjukkan bahwa sebagian besar rekomendasinya banyak yang tidak sesuai dengan genre film Toy Story dan nilainya tergolong sangat rendah.
   - Jika melihat nilai Novelty dan Diversity, nampaknya sangat tinggi karena memberikan rekomendasi film yang kurang dikenal pengguna berdasarkan film yang telah ditonton.
 

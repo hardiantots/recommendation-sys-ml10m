@@ -116,6 +116,7 @@ Untuk mengevaluasi kinerja kedua model rekomendasi, digunakan beberapa metrik be
 - Diversity (Keberagaman)-Novelty (Kebaruan) saat item rekomendasi muncul. Diversity akan mengukur seberapa beragam item yang direkomendasikan (tidak semuanya mirip satu sama lain) dan Novelty akan mengukur seberapa tidak populer / belum dikenal item yang direkomendasikan. Umumnya dihitung dari frekuensi item muncul di data.
 
 Formula untuk Cosine Similarity yaitu:
+<br>
 ![CS](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cosine_similarity.png)
 
 \[
@@ -133,10 +134,9 @@ Nilai cosine similarity berkisar antara:
 0 → tidak mirip (vektor ortogonal)
 
 -1 → sangat berlawanan arah (jarang muncul di sistem rekomendasi)
-
 <br>
-
 Formula untuk Diversity dan Novelty yaitu:
+<br>
 ![Diver](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/diversity.png)
 
 \[
@@ -146,7 +146,7 @@ Formula untuk Diversity dan Novelty yaitu:
 - \( S \): himpunan item yang direkomendasikan
 - \( \text{sim}(i, j) \): similarity antar item i dan j (biasanya cosine similarity)
 - Semakin tinggi nilai Diversity, semakin beragam item rekomendasinya
-
+<br>
 ![Novel](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/novelty.png)
 
 \[

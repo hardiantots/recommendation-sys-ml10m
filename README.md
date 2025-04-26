@@ -27,7 +27,7 @@ Dalam industri layanan streaming film, perusahaan harus dapat memberikan pengala
 ### Solution Statements
 - Dalam mencapai tujuan ini, akan digunakan diterapkan 2 teknik (Content-Based Filtering & Collaborative Filtering) untuk membandingkan efektivitas masing-masing teknik dalam kasus tertentu ketika memprediksi preferensi pengguna.
 - Dilakukan proses Normalisasi untuk kolom tertentu dan TF-IDF untuk menghitung frekuensi kemunculan kata dalam suatu kolom.
-- Pengukuran performa setiap teknik akan menggunakan Cosine Similarity dan Diversity (Keberagaman)-Novelty (Kebaruan) saat item rekomendasi muncul.  
+- Pengukuran performa setiap teknik akan menggunakan Cosine Similarity dan Diversity (Keberagaman) saat item rekomendasi muncul.  
 
 ## Data Understanding
 Dataset yang digunakan dalam proyek ini adalah data film MovieLens dengan jumlah rating dalam dataset tersebut sebanyak 10M (10.000.000) yang diaplikasikan pada 10.000 film oleh sekitar 72.000 pengguna platform MovieLens untuk memberikan rating. Dataset ini diperoleh dari sumber Grouplens (https://grouplens.org/datasets/movielens/10m/). Dataset ini terdiri dari 3 file utama yang bisa digunakan untuk membangun sistem rekomendasi:
@@ -35,6 +35,8 @@ Dataset yang digunakan dalam proyek ini adalah data film MovieLens dengan jumlah
 ### 1. Movies Dataset (movies.dat)
 * Kondisi Data:
   - Dataset terdiri dari 10.681 data dan 3 kolom
+  - Tidak terdapat missing value
+  - Tidak terdapat data yang terduplikat
 * Fitur Dataset:
   - movieId: ID unik untuk setiap film (integer)
   - title: Judul film (string) 
@@ -43,23 +45,28 @@ Dataset yang digunakan dalam proyek ini adalah data film MovieLens dengan jumlah
 ### 2. Ratings Dataset (ratings.dat) 
 * Kondisi Data:
   - Terdiri dari 10.000.054 data dan 4 kolom
+  - Tidak terdapat juga missing value
+  - Tidak memiliki data yang terduplikat
 * Fitur Dataset:
   - userId: ID unik setiap pengguna (integer)
   - movieId: ID unik setiap film yang memiliki rating (integer) 
   - rating: Rating yang diberikan pengguna kepada suatu film dengan skala 0.0-5.0 (float)
-  - timestamp
+  - timestamp: Waktu penanda user memberikan rating (Unix format - integer)
 
 ### 3. Tags Dataset (tags.dat)
 * Kondisi Data:
   - Terdiri dari 95.580 data dan 4 kolom
+  - Terdapat 16 missing value pada kolom 'tag'
+  - Tidak memiliki data yang terduplikat
 * Fitur Dataset:
   - userId: ID unik setiap pengguna (integer)
   - movieId: ID unik setiap film yang memiliki rating (integer) 
   - tag: Teks yang menggambarkan kesan pengguna terhadap film tersebut (string)
-  - timestamp: 
+  - timestamp: Waktu penanda user memberikan tag (Unix format - integer)
 
 ### Tahapan Pemahaman pada Data
-- Diawali dengan menggabungkan 2 dataset sebagai 1 dataset untuk melakukan analisis lebih lanjut (Movies & Ratings Dataset). Untuk Tags Dataset tidak digabung karena informasinya untuk keadaan terkini belum diperlukan
+- Diawali dengan menggabungkan 2 dataset sebagai 1 dataset untuk melakukan analisis lebih lanjut (Movies & Ratings Dataset). Untuk Tags Dataset tidak digabung karena informasinya untuk keadaan terkini belum diperlukan.
+- Hasil penggabungan ini menghasilkan 6 kolom (userId, movieId, rating, timestamp, title, dan genres)
 - Selanjutnya yaitu menggali infomasi pada dataset (jumlah baris-kolom, tipe data setiap kolom identifikasi missing value, melihat visualisasi distribusi, dll.). Dalam pemahaman ini dilakukan beberapa perubahan, seperti mengubah tipe data kolom timestamp (dari unix menjadi datetime), mengekstrak tahun rilis film dari judul film, menghapus film yang tidak memiliki genre, dan lain sebagainya.
 - Beberapa Explorartory Data Analysis juga dilakukan dalam rangka mencoba memahami dataset yang ada, seperti melihat distribusi rating pengguna, melihat urutan Top 10 pada data (Genre Film Terbanyak, Tahun & Bulan dengan Pemberian Rating Terbanyak, Film dengan Pemberian Rating & Rata-rata Rating Terbanyak).
 
@@ -109,11 +116,25 @@ Selain itu, saat proses train berlangsung, terdapat juga beberapa parameter utam
 - num_iters=2500: Jumlah total iterasi training. Tiap iterasi melakukan 1 update pada parameter model menggunakan gradient descent.
 - eval_interval=15: Setiap 15 iterasi, model akan menghitung evaluasi pada data training dan testing. Nilai ini disimpan ke history dan dicetak ke layar.
 - plot: True	Menentukan apakah akan ditampilkan plot evaluasi terhadap iterasi di akhir training. Berguna untuk melihat tren overfitting atau konvergensi.
+
+### Model Results
+Dari hasil pembuatan sistem rekomendasi film dengan 2 pendekatan, berikut ini merupakan top-10 dari hasil rekomendasi film berdasarkan:
+  - Content-Based Filtering
+  ![CS_Result](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cbased_result.png)
+  <br>
+
+  - Collaborative Filtering (Preferensi User)
+  ![CB_Result1](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cb1.png)
+  <br>
+
+  - Collaborative Filtering (Preferensi Film)
+  ![CB_Result2](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cb2.png)
+  <br>
   
 ## Evaluation
 Untuk mengevaluasi kinerja kedua model rekomendasi, digunakan beberapa metrik berikut:
 - Cosine Similarity (Mengukur kemiripan antara dua vektor dalam ruang berdimensi tinggi berdasarkan sudut di antara mereka.)
-- Diversity (Keberagaman)-Novelty (Kebaruan) saat item rekomendasi muncul. Diversity akan mengukur seberapa beragam item yang direkomendasikan (tidak semuanya mirip satu sama lain) dan Novelty akan mengukur seberapa tidak populer / belum dikenal item yang direkomendasikan. Umumnya dihitung dari frekuensi item muncul di data.
+- Diversity (Keberagaman) saat item rekomendasi muncul. Diversity akan mengukur seberapa beragam item yang direkomendasikan (tidak semuanya mirip satu sama lain)
 
 Formula untuk Cosine Similarity yaitu:
 <br>
@@ -137,7 +158,7 @@ Nilai cosine similarity berkisar antara:
 
 <br>
 
-Formula untuk Diversity dan Novelty yaitu:
+Formula untuk Diversity yaitu:
 <br>
 ![Diver](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/diversity.png)
 
@@ -151,38 +172,21 @@ Formula untuk Diversity dan Novelty yaitu:
   
 <br>
 
-![Novel](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/novelty.png)
-
-\[
-\text{Novelty}(R) = \frac{1}{|R|} \sum_{i \in R} -\log_2(P(i))
-\]
-
-- \( R \): himpunan item yang direkomendasikan
-- \( P(i) \): probabilitas/popularitas item i (misalnya: proporsi user yang menonton)
-- Semakin tinggi nilai novelty, semakin unik/tidak umum item tersebut
-
-<br>
-
 Evaluasi untuk hasil rekomendasi dengan Content-Based Filtering yaitu:
-![CS_Result](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cbased_result.png)
   - Untuk rekomendasi pada user yang menonton Toy Story, hasilnya menunjukkan bahwa rekomendasinya memiliki genre yang hampir identik "Adventure Animation Children Comedy Fantasy". Selain itu, judul-judul film berasal dari studio dan gaya yang serupa (misal: Pixar, DreamWorks, Studio Ghibli).
-  - Jika melihat nilai Cosine Similarity, nilai kesamaannya sangat tinggi (mendekati 1), sehingga jika melihat juga ke diversitynya, rekomendasi ini kurang beragam namun cocok untuk bisa mempertahankan relevansi.
-  - Jika melihat dari sisi Novelty, rekomendasi ini kurang memberikan kebaruan. Cenderung merekomendasikan film yang sudah sangat dikenal user.
+  - Jika melihat nilai Cosine Similarity, nilai kesamaannya sangat tinggi (mendekati 1), sehingga rekomendasi ini namun cocok untuk bisa mempertahankan relevansi film dari user.
+  - Jika melihat dari sisi Diversity berdasarkan fungsi yang telah dibuat, hasilnya sangat rendah (0.093) yang menandakan rekomendasi ini kurang memberikan kebaruan. Cenderung merekomendasikan film yang sudah sangat dikenal user.
 
 Evaluasi untuk hasil rekomendasi dengan Collaborative Filtering yaitu:
-![CB_Result1](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cb1.png)
-  - Untuk rekomendasi berdasarkan preferensi user, diupayakan untuk menyesuaikan hasil rekomendasi dengan kecenderungan genre yang telah ditonton oleh user tertentu. Jika melihat nilai Cosine Similaritynya, hasilnya menunjukkan bahwa sebagian besar rekomendasinya masih sesuai dengan preferensi user,namun beberapa film horror/sci-fi masuk padahal itu bukan preferensi utama user.
-  - Jika melihat nilai Novelty, terdapat judul-judul seperti Zombie Lake, Zombie Strippers!, dan The Onion Movie adalah film kurang terkenal di kalangan umum. Sehingga ini bisa untuk merekomendasikan film yang jarang muncul, memberi pengalaman baru.
-  - Jika melihat dari sisi Diversity, beberapa film menyertakan kombinasi genre unik (e.g. Comedy Horror, Comedy Documentary Romance), yang menandakan bahwa nilai diversity cukup tinggi. Cocok untuk user yang suka eksplorasi.
-
-![CB_Result2](https://raw.githubusercontent.com/hardiantots/recommendation-sys-ml10m/main/assets_rs/cb2.png)
-  - Rekomendasi dilakukan berdasarkan preferensi film yang telah ditonton. Jika melihat nilai Cosine Similaritynya, hasilnya menunjukkan bahwa sebagian besar rekomendasinya banyak yang tidak sesuai dengan genre film Toy Story dan nilainya tergolong sangat rendah.
-  - Jika melihat nilai Novelty dan Diversity, nampaknya sangat tinggi karena memberikan rekomendasi film yang kurang dikenal pengguna berdasarkan film yang telah ditonton.
+  - Untuk rekomendasi berdasarkan preferensi user, diupayakan untuk menyesuaikan hasil rekomendasi dengan kecenderungan genre yang telah ditonton oleh user tertentu. Jika melihat nilai Cosine Similaritynya, hasilnya menunjukkan bahwa sebagian besar rekomendasinya masih sesuai dengan preferensi user, namun beberapa film horror/sci-fi masuk padahal itu bukan preferensi utama user.
+  - Jika melihat dari sisi Diversity berdasarkan preferensi user, hasilnya sangat tinggi (0.95), yang menandakan adanya beberapa film menyertakan kombinasi genre unik (e.g. Comedy Horror, Comedy Documentary Romance). Cocok untuk user yang suka eksplorasi.
+  - Untuk rekomendasi yang dilakukan berdasarkan preferensi film yang telah ditonton, jika melihat nilai Cosine Similaritynya, hasilnya menunjukkan bahwa sebagian besar rekomendasinya banyak yang tidak sesuai dengan genre film Toy Story dan nilainya tergolong sangat rendah.
+  - Jika melihat dari sisi Diversity berdasarkan preferensi film, hasilnya sangat tinggi (0.97), karena memberikan rekomendasi film yang kurang dikenal pengguna berdasarkan film yang telah ditonton.
 
 Kesimpulan akhir:
-- Dengan menggunakan Content-Based Filtering, hasilnya sangat genre-driven dan relevan dengan film asal (misalnya Toy Story → film anak-anak, animasi, dll) yang bisa digunakan untuk tetap menjaga relevasi konten yang ditonton pengguna, tetapi kurang bisa memberikan variasi rekomendasi (novelty dan diversitynya rendah) yang lebih terhadap user.
+- Dengan menggunakan Content-Based Filtering, hasilnya sangat genre-driven dan relevan dengan film asal (misalnya Toy Story → film anak-anak, animasi, dll) yang bisa digunakan untuk tetap menjaga relevasi konten yang ditonton pengguna, tetapi kurang bisa memberikan variasi rekomendasi (diversitynya rendah) yang lebih terhadap user.
 - Dengan menggunakan Collaborative Filtering, hasilnya dapat menemukan hubungan tersembunyi antar item dan antar user serta bisa merekomendasikan hal di luar genre yang kelihatan. Namun, untuk memberikan rekomendasi berdasarkan film yang telah ditonton, kurang memberikan hasil yang baik meskipun telah memberikan keragaman dalam rekomendasi filmnya
-- Content-Based cocok untuk genre match, interpretasi eksplisit, dan ketika kita tahu apa yang mirip. Collaborative Filtering unggul dalam menemukan pola tersembunyi yang tidak bisa dilihat dari metadata saja, serta memberikan novelty dan diversity lebih tinggi.
+- Content-Based cocok untuk genre match, interpretasi eksplisit, dan ketika kita tahu apa yang mirip. Collaborative Filtering unggul dalam menemukan pola tersembunyi yang tidak bisa dilihat dari metadata saja, serta memberikan diversity lebih tinggi.
 
 ## Daftar Pustaka
 [[1]]Department of Computer Science, California State Polytechnic University, Pomona, CA, USA, Salloum, S., & Rajamanthri, D. (2021). Implementation and Evaluation of Movie Recommender Systems Using Collaborative Filtering. Journal of Advances in Information Technology, 12(3). https://doi.org/10.12720/jait.12.3.189-196
